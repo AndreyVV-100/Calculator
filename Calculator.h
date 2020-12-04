@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #pragma warning (disable : 4996)
 
@@ -14,6 +15,8 @@ int GetG (char** eq);
 int GetE (char** eq);
 
 int GetT (char** eq);
+
+int GetD (char** eq);
 
 int GetP (char** eq);
 

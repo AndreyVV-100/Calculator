@@ -61,7 +61,7 @@ int GetT (char** eq)
 {
 	ass;
 
-	int result = GetP (eq);
+	int result = GetD (eq);
 
 	while (**eq == '*' || **eq == '/')
 	{
@@ -69,9 +69,25 @@ int GetT (char** eq)
 		*eq += 1;
 
 		if (operat)
-			result *= GetP (eq);
+			result *= GetD (eq);
 		else
-			result /= GetP (eq);
+			result /= GetD (eq);
+	}
+
+	return result;
+}
+
+int GetD (char** eq)
+{
+	ass;
+
+	int result = GetP (eq);
+
+	if (**eq == '^')
+	{
+		*eq += 1;
+		int exponent = GetD (eq);
+		result = (int) round (pow (result, exponent));
 	}
 
 	return result;
