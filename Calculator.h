@@ -8,23 +8,30 @@
 #pragma warning (disable : 4996)
 
 #define ass assert (eq);    \
-            assert (*eq)
+            assert (*eq);   \
+            assert (vars)
 
 void Require (char** eq, char symb);
 
+/* ToDo: Dictionary*/
+
 double GetG (char* equation);
 
-double GetE (char** eq);
+void   GetM (char** eq, double* vars);
 
-double GetT (char** eq);
+double GetE (char** eq, double* vars);
 
-double GetD (char** eq);
+double GetT (char** eq, double* vars);
 
-double GetU (char** eq);
+double GetD (char** eq, double* vars);
 
-double GetP (char** eq);
+double GetU (char** eq, double* vars);
 
-double GetN (char** eq);
+double GetP (char** eq, double* vars);
+
+double GetV (char** eq, double* vars);
+
+double GetN (char** eq, double* vars);
 
 int CountSize (FILE* file);
 

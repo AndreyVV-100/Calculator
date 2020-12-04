@@ -14,7 +14,8 @@ int main ()
 
 void Require (char** eq, char symb)
 {
-	ass;
+	assert (eq);
+	assert (*eq);
 
 	if (**eq == symb)
 	{
@@ -29,19 +30,45 @@ void Require (char** eq, char symb)
 double GetG (char* equation)
 {
 	assert (equation);
-
 	char* eq = equation;
-	double result = GetE (&eq);
+	double vars['z' - 'a' + 1] = {};
+
+	for (size_t i_var = 0; i_var <= 'z' - 'a'; i_var++)
+		vars[i_var] = NAN;
+
+	while (eq[1] == '=')
+		GetM (&eq, vars);
+
+	double result = GetE (&eq, vars);
 	Require (&eq, '\0');
 
 	return result;
 }
 
-double GetE (char** eq)
+void   GetM (char** eq, double* vars)
+{
+	ass;
+	
+	if (!islower (**eq))
+	{
+		printf ("Variable error: %s", *eq);
+		exit (1);
+	}
+	
+	size_t position = **eq - 'a';
+	*eq += 1;
+	Require (eq, '=');
+
+	vars[position] = GetE (eq, vars);
+	Require (eq, '\n');
+	return;
+}
+
+double GetE (char** eq, double* vars)
 {
 	ass;
 
-	double result = GetT (eq);
+	double result = GetT (eq, vars);
 
 	while (**eq == '+' || **eq == '-')
 	{
@@ -49,19 +76,19 @@ double GetE (char** eq)
 		*eq += 1;
 
 		if (operat)
-			result += GetT (eq);
+			result += GetT (eq, vars);
 		else
-			result -= GetT (eq);
+			result -= GetT (eq, vars);
 	}
 
 	return result;
 }
 
-double GetT (char** eq)
+double GetT (char** eq, double* vars)
 {
 	ass;
 
-	double result = GetD (eq);
+	double result = GetD (eq, vars);
 
 	while (**eq == '*' || **eq == '/')
 	{
@@ -69,31 +96,31 @@ double GetT (char** eq)
 		*eq += 1;
 
 		if (operat)
-			result *= GetD (eq);
+			result *= GetD (eq, vars);
 		else
-			result /= GetD (eq);
+			result /= GetD (eq, vars);
 	}
 
 	return result;
 }
 
-double GetD (char** eq)
+double GetD (char** eq, double* vars)
 {
 	ass;
 
-	double result = GetU (eq);
+	double result = GetU (eq, vars);
 
 	if (**eq == '^')
 	{
 		*eq += 1;
-		double exponent = GetD (eq);
+		double exponent = GetD (eq, vars);
 		result = pow (result, exponent);
 	}
 
 	return result;
 }
 
-double GetU (char** eq)
+double GetU (char** eq, double* vars)
 {
 	ass;
 
@@ -106,10 +133,9 @@ double GetU (char** eq)
 				if (strncmp ("cos", *eq, 3) == 0)
 				{
 					*eq += 3;
-					return cos (GetP (eq));
+					return cos (GetP (eq, vars));
 				}
-				printf ("Operator error: %s", *eq);
-				exit (1);
+				break;
 			}
 
 			case 's':
@@ -117,22 +143,17 @@ double GetU (char** eq)
 				if (strncmp ("sin", *eq, 3) == 0)
 				{
 					*eq += 3;
-					return sin (GetP (eq));
+					return sin (GetP (eq, vars));
 				}
-				printf ("Operator error: %s", *eq);
-				exit (1);
+				break;
 			}
-
-			default:
-				printf ("Operator error: %s", *eq);
-				exit (1);
 		}
 	}
 
-	return GetP (eq);
+	return GetP (eq, vars);
 }
 
-double GetP (char** eq)
+double GetP (char** eq, double* vars)
 {
 	ass;
 
@@ -140,16 +161,28 @@ double GetP (char** eq)
 	if (**eq == '(')
 	{
 		*eq += 1;
-		result = GetE (eq);
+		result = GetE (eq, vars);
 		Require (eq, ')');
 	}
+	else if (islower (**eq))
+		result = GetV (eq, vars);
 	else
-		result = GetN (eq);
+		result = GetN (eq, vars);
 
 	return result;
 }
 
-double GetN (char** eq)
+double GetV (char** eq, double* vars)
+{
+	ass;
+	assert (islower (**eq));
+	
+	double result = vars[**eq - 'a'];
+	*eq += 1;
+	return result;
+}
+
+double GetN (char** eq, double* vars)
 {
 	assert (eq);
 	assert (*eq);
