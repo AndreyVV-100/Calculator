@@ -4,9 +4,9 @@ int main ()
 {
 	char* equation = nullptr;
 	ReadTxt (&equation, "Calc/eq1.txt");
-	char* eq = equation;
-	int result = GetG (&eq);
-	printf ("%d", result);
+
+	double result = GetG (equation);
+	printf ("%lf", result);
 
 	free (equation);
 	return 0;
@@ -26,22 +26,22 @@ void Require (char** eq, char symb)
 	exit (1);
 }
 
-int GetG (char** eq)
+double GetG (char* equation)
 {
-	ass;
+	assert (equation);
 
-	int result = GetE (eq);
-	Require (eq, '\0');
+	char* eq = equation;
+	double result = GetE (&eq);
+	Require (&eq, '\0');
 
-	*eq = nullptr;
 	return result;
 }
 
-int GetE (char** eq)
+double GetE (char** eq)
 {
 	ass;
 
-	int result = GetT (eq);
+	double result = GetT (eq);
 
 	while (**eq == '+' || **eq == '-')
 	{
@@ -57,11 +57,11 @@ int GetE (char** eq)
 	return result;
 }
 
-int GetT (char** eq)
+double GetT (char** eq)
 {
 	ass;
 
-	int result = GetD (eq);
+	double result = GetD (eq);
 
 	while (**eq == '*' || **eq == '/')
 	{
@@ -77,27 +77,27 @@ int GetT (char** eq)
 	return result;
 }
 
-int GetD (char** eq)
+double GetD (char** eq)
 {
 	ass;
 
-	int result = GetP (eq);
+	double result = GetP (eq);
 
 	if (**eq == '^')
 	{
 		*eq += 1;
-		int exponent = GetD (eq);
-		result = (int) round (pow (result, exponent));
+		double exponent = GetD (eq);
+		result = pow (result, exponent);
 	}
 
 	return result;
 }
 
-int GetP (char** eq)
+double GetP (char** eq)
 {
 	ass;
 
-	int result = 0;
+	double result = 0;
 	if (**eq == '(')
 	{
 		*eq += 1;
@@ -110,18 +110,35 @@ int GetP (char** eq)
 	return result;
 }
 
-int GetN (char** eq)
+double GetN (char** eq)
 {
 	assert (eq);
 	assert (*eq);
 
-	int result = 0;
-	bool OK = 0;
+	double result = 0;
+	int OK = 0;
+
 	while ('0' <= **eq && **eq <= '9')
 	{
 		OK = 1;
 		result = result * 10 + (**eq) - '0';
 		*eq += 1;
+	}
+
+	if (OK && **eq == '.')
+	{
+		// OK - shift
+		OK = 0;
+		*eq += 1;
+	
+		while ('0' <= **eq && **eq <= '9')
+		{
+			OK++;
+			result = result * 10 + (**eq) - '0';
+			*eq += 1;
+		}
+
+		result *= pow (0.1, OK);
 	}
 
 	if (!OK)

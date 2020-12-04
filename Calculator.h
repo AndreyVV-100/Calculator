@@ -10,17 +10,17 @@
 
 void Require (char** eq, char symb);
 
-int GetG (char** eq);
+double GetG (char* equation);
 
-int GetE (char** eq);
+double GetE (char** eq);
 
-int GetT (char** eq);
+double GetT (char** eq);
 
-int GetD (char** eq);
+double GetD (char** eq);
 
-int GetP (char** eq);
+double GetP (char** eq);
 
-int GetN (char** eq);
+double GetN (char** eq);
 
 int CountSize (FILE* file);
 
