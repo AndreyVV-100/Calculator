@@ -81,7 +81,7 @@ double GetD (char** eq)
 {
 	ass;
 
-	double result = GetP (eq);
+	double result = GetU (eq);
 
 	if (**eq == '^')
 	{
@@ -91,6 +91,45 @@ double GetD (char** eq)
 	}
 
 	return result;
+}
+
+double GetU (char** eq)
+{
+	ass;
+
+	if (islower (**eq))
+	{
+		switch (**eq)
+		{
+			case 'c':
+			{
+				if (strncmp ("cos", *eq, 3) == 0)
+				{
+					*eq += 3;
+					return cos (GetP (eq));
+				}
+				printf ("Operator error: %s", *eq);
+				exit (1);
+			}
+
+			case 's':
+			{
+				if (strncmp ("sin", *eq, 3) == 0)
+				{
+					*eq += 3;
+					return sin (GetP (eq));
+				}
+				printf ("Operator error: %s", *eq);
+				exit (1);
+			}
+
+			default:
+				printf ("Operator error: %s", *eq);
+				exit (1);
+		}
+	}
+
+	return GetP (eq);
 }
 
 double GetP (char** eq)
@@ -118,7 +157,7 @@ double GetN (char** eq)
 	double result = 0;
 	int OK = 0;
 
-	while ('0' <= **eq && **eq <= '9')
+	while (isdigit (**eq))
 	{
 		OK = 1;
 		result = result * 10 + (**eq) - '0';
@@ -131,7 +170,7 @@ double GetN (char** eq)
 		OK = 0;
 		*eq += 1;
 	
-		while ('0' <= **eq && **eq <= '9')
+		while (isdigit (**eq))
 		{
 			OK++;
 			result = result * 10 + (**eq) - '0';
