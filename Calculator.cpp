@@ -143,6 +143,14 @@ double GetUnary (char** eq, double* vars)
 	{
 		switch (**eq)
 		{
+			#define check_and_get(cmd, len) if (strncmp (#cmd, *eq, len) == 0)	\
+											{									\
+												*eq += len;						\
+												return cmd (GetP (eq, vars));	\
+											}
+			#include "FunctionsList.h"
+			#undef check_and_get			
+			/*
 			case 'c':
 			{
 				if (strncmp ("cos", *eq, 3) == 0)
@@ -161,7 +169,7 @@ double GetUnary (char** eq, double* vars)
 					return sin (GetP (eq, vars));
 				}
 				break;
-			}
+			}*/
 		}
 	}
 
@@ -287,3 +295,19 @@ void  SkipSpaces (char** eq)
 
 	return;
 }
+
+double arcsin(double num){ return NAN; }
+double arccos (double num) { return NAN; }
+double arctg (double num) { return NAN; }
+double arcctg (double num) { return NAN; }
+double arcsh (double num) { return NAN; }
+double arcch (double num) { return NAN; }
+double arcth (double num) { return NAN; }
+double arccth (double num) { return NAN; }
+double tg (double num) { return NAN; }
+double ctg (double num) { return NAN; }
+double sh (double num) { return NAN; }
+double ch (double num) { return NAN; }
+double th (double num) { return NAN; }
+double cth (double num) { return NAN; }
+double ln (double num) { return NAN; }

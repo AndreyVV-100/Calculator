@@ -18,8 +18,6 @@
 
 bool Require_F (char** eq, char symb);
 
-/* ToDo: Dictionary*/
-
 double GetG (char* equation);
 
 bool GetVarDefine (char** eq, double* vars);
@@ -43,3 +41,19 @@ int CountSize (FILE* file);
 size_t ReadTxt (char** text, const char* file_name);
 
 void  SkipSpaces (char** eq);
+
+double arcsin (double num);
+double arccos (double num);
+double arctg (double num);
+double arcctg (double num);
+double arcsh (double num);
+double arcch (double num);
+double arcth (double num);
+double arccth (double num);
+double tg (double num);
+double ctg (double num);
+double sh (double num);
+double ch (double num);
+double th (double num);
+double cth (double num);
+double ln (double num);
