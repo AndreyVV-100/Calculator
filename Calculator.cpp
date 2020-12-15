@@ -2,13 +2,7 @@
 
 int main ()
 {
-	char* equation = nullptr;
-	ReadTxt (&equation, "Calc/eq2.txt");
-
-	double result = GetG (equation);
-	printf ("\n" "Result = %lf", result);
-
-	free (equation);
+	GetG ("Calc/eq2.txt");
 	return 0;
 }
 
@@ -27,9 +21,13 @@ bool Require_F (char** eq, char symb)
 	return 1;
 }
 
-double GetG (char* equation)
+double GetG (const char* file_path)
 {
-	assert (equation);
+	char* equation = nullptr;
+	ReadTxt (&equation, file_path);
+	if (!equation)
+		return NAN;
+	
 	char* eq = equation;
 	double vars['z' - 'a' + 1] = {};
 
@@ -43,6 +41,8 @@ double GetG (char* equation)
 	double result = GetE (&eq, vars);
 	Require (&eq, '\0');
 
+	printf ("\n" "Result = %lf", result);
+	free (equation);
 	return result;
 }
 
@@ -149,27 +149,7 @@ double GetUnary (char** eq, double* vars)
 												return cmd (GetP (eq, vars));	\
 											}
 			#include "FunctionsList.h"
-			#undef check_and_get			
-			/*
-			case 'c':
-			{
-				if (strncmp ("cos", *eq, 3) == 0)
-				{
-					*eq += 3;
-					return cos (GetP (eq, vars));
-				}
-				break;
-			}
-
-			case 's':
-			{
-				if (strncmp ("sin", *eq, 3) == 0)
-				{
-					*eq += 3;
-					return sin (GetP (eq, vars));
-				}
-				break;
-			}*/
+			#undef check_and_get
 		}
 	}
 

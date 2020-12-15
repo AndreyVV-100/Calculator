@@ -18,7 +18,7 @@
 
 bool Require_F (char** eq, char symb);
 
-double GetG (char* equation);
+double GetG (const char* file_path);
 
 bool GetVarDefine (char** eq, double* vars);
 
