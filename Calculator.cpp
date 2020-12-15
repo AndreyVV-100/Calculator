@@ -3,16 +3,16 @@
 int main ()
 {
 	char* equation = nullptr;
-	ReadTxt (&equation, "Calc/eq1.txt");
+	ReadTxt (&equation, "Calc/eq2.txt");
 
 	double result = GetG (equation);
-	printf ("%lf", result);
+	printf ("\n" "Result = %lf", result);
 
 	free (equation);
 	return 0;
 }
 
-void Require (char** eq, char symb)
+bool Require_F (char** eq, char symb)
 {
 	assert (eq);
 	assert (*eq);
@@ -20,11 +20,11 @@ void Require (char** eq, char symb)
 	if (**eq == symb)
 	{
 		*eq += 1;
-		return;
+		return 0;
 	}
 
-	printf ("Require error: %s", *eq);
-	exit (1);
+	printf ("Require \'%c\' (%d) error: %s", symb, symb, *eq);
+	return 1;
 }
 
 double GetG (char* equation)
@@ -36,8 +36,9 @@ double GetG (char* equation)
 	for (size_t i_var = 0; i_var <= 'z' - 'a'; i_var++)
 		vars[i_var] = NAN;
 
-	while (eq[1] == '=')
-		GetM (&eq, vars);
+	while (strchr (eq, '='))
+		if (GetVarDefine (&eq, vars))
+			return NAN;
 
 	double result = GetE (&eq, vars);
 	Require (&eq, '\0');
@@ -45,23 +46,31 @@ double GetG (char* equation)
 	return result;
 }
 
-void   GetM (char** eq, double* vars)
+bool GetVarDefine (char** eq, double* vars)
 {
 	ass;
 	
 	if (!islower (**eq))
 	{
 		printf ("Variable error: %s", *eq);
-		exit (1);
+		return 1;
 	}
-	
+
+	SkSp;
 	size_t position = **eq - 'a';
 	*eq += 1;
-	Require (eq, '=');
 
-	vars[position] = GetE (eq, vars);
-	Require (eq, '\n');
-	return;
+	SkSp;
+	Require_F (eq, '=');
+	SkSp;
+
+	vars[position] = GetN (eq, vars);
+	if (isnan (vars[position]))
+		return 1;
+
+	SkSp;
+	Require_F (eq, '\n');
+	return 0;
 }
 
 double GetE (char** eq, double* vars)
@@ -69,8 +78,9 @@ double GetE (char** eq, double* vars)
 	ass;
 
 	double result = GetT (eq, vars);
+	SkSp;
 
-	while (**eq == '+' || **eq == '-')
+	while ((**eq == '+' || **eq == '-') && !isnan (result))
 	{
 		bool operat = (**eq == '+') ? 1:0;
 		*eq += 1;
@@ -79,6 +89,7 @@ double GetE (char** eq, double* vars)
 			result += GetT (eq, vars);
 		else
 			result -= GetT (eq, vars);
+		SkSp;
 	}
 
 	return result;
@@ -88,41 +99,45 @@ double GetT (char** eq, double* vars)
 {
 	ass;
 
-	double result = GetD (eq, vars);
+	double result = GetDegree (eq, vars);
+	SkSp;
 
-	while (**eq == '*' || **eq == '/')
+	while ((**eq == '*' || **eq == '/') && !isnan (result))
 	{
 		bool operat = (**eq == '*') ? 1 : 0;
 		*eq += 1;
 
 		if (operat)
-			result *= GetD (eq, vars);
+			result *= GetDegree (eq, vars);
 		else
-			result /= GetD (eq, vars);
+			result /= GetDegree (eq, vars);
+		SkSp;
 	}
 
 	return result;
 }
 
-double GetD (char** eq, double* vars)
+double GetDegree (char** eq, double* vars)
 {
 	ass;
 
-	double result = GetU (eq, vars);
+	double result = GetUnary (eq, vars);
+	SkSp;
 
-	if (**eq == '^')
+	if (**eq == '^' && !isnan (result))
 	{
 		*eq += 1;
-		double exponent = GetD (eq, vars);
+		double exponent = GetDegree (eq, vars);
 		result = pow (result, exponent);
 	}
 
 	return result;
 }
 
-double GetU (char** eq, double* vars)
+double GetUnary (char** eq, double* vars)
 {
 	ass;
+	SkSp;
 
 	if (islower (**eq))
 	{
@@ -156,6 +171,7 @@ double GetU (char** eq, double* vars)
 double GetP (char** eq, double* vars)
 {
 	ass;
+	SkSp;
 
 	double result = 0;
 	if (**eq == '(')
@@ -165,14 +181,14 @@ double GetP (char** eq, double* vars)
 		Require (eq, ')');
 	}
 	else if (islower (**eq))
-		result = GetV (eq, vars);
+		result = GetVar (eq, vars);
 	else
 		result = GetN (eq, vars);
 
 	return result;
 }
 
-double GetV (char** eq, double* vars)
+double GetVar (char** eq, double* vars)
 {
 	ass;
 	assert (islower (**eq));
@@ -216,7 +232,7 @@ double GetN (char** eq, double* vars)
 	if (!OK)
 	{
 		printf ("Number error: %s", *eq);
-		exit (1);
+		return NAN;
 	}
 
 	return result;
@@ -237,23 +253,37 @@ size_t ReadTxt (char** text, const char* file_name)
 	assert (file_name);
 
 	FILE* file = fopen (file_name, "r");
-	if (file == NULL)
+	if (file == nullptr)
 	{
 		printf ("[Input error] Unable to open file \"%s\"\n", file_name);
-		exit (EXIT_FAILURE);
+		return 0;
 	}
 
 	size_t num_symbols = CountSize (file);
 
-	*text = (char*) calloc (num_symbols + 2, sizeof (**text));
+	*text = (char*)calloc (num_symbols + 2, sizeof (**text));
+
 	if (*text == nullptr)
 	{
 		printf ("[Error] Unable to allocate memory\n");
-		exit (EXIT_FAILURE);
+		return 0;
 	}
 
 	fread (*text, sizeof (**text), num_symbols, file);
 	fclose (file);
 
+	(*text)[num_symbols] = '\0';
+
 	return num_symbols;
+}
+
+void  SkipSpaces (char** eq)
+{
+	assert (eq);
+	assert (*eq);
+
+	while (**eq == ' ' || **eq == '\t' || **eq == '\r')
+		*eq += 1;
+
+	return;
 }
